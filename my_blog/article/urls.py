@@ -10,5 +10,7 @@ urlpatterns = [
     # 写文章
     url(r'^create/$', views.NewArticle.as_view(), name='article_create'),
     # 删除文章
-    url(r'^delete/(?P<article_id>\d+)/$', views.DeleteArticleView.as_view(), name='article_delete')
+    url(r'^delete/(?P<article_id>\d+)/$', views.DeleteArticleView.as_view(), name='article_delete'),
+    # 修改文章
+    url(r'^update/(?P<article_id>\d+)/$', views.UpdateArticleView.as_view(), name='article_update'),
 ]

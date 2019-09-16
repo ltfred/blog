@@ -77,6 +77,7 @@ class NewArticle(View):
 
 
 class DeleteArticleView(View):
+    """删除文章"""
 
     def get(self, request, article_id):
         """删除文章"""
@@ -87,4 +88,41 @@ class DeleteArticleView(View):
         except:
             return http.HttpResponse('数据库错误')
         # 删除后回到文章列表页
+        return redirect(reverse('article:article_list'))
+
+
+class UpdateArticleView(View):
+    """修改文章"""
+
+    def get(self, request, article_id):
+        """获取原文章"""
+        try:
+            article = ArticlePost.objects.get(id=article_id)
+        except:
+            return http.HttpResponse('数据库错误')
+
+        context = {'article': article}
+
+        return render(request, 'article/update.html', context)
+
+    def post(self, request, article_id):
+        # 获取参数
+        title = request.POST.get('title')
+        body = request.POST.get('body')
+
+        # 检验参数
+        if not all([title, body]):
+            return http.HttpResponse('缺少必传参数')
+        # 获取当前用户
+        user = request.user
+
+        try:
+            article = ArticlePost.objects.get(id=article_id)
+            article.title = title
+            article.body = body
+            article.save()
+
+        except:
+            return http.HttpResponse('数据库错误')
+        # 新增文章后回到列表页
         return redirect(reverse('article:article_list'))
