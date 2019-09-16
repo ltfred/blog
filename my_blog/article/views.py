@@ -72,5 +72,19 @@ class NewArticle(View):
 
         except:
             return http.HttpResponse('数据库错误')
+        # 新增文章后回到列表页
+        return redirect(reverse('article:article_list'))
 
+
+class DeleteArticleView(View):
+
+    def get(self, request, article_id):
+        """删除文章"""
+
+        try:
+            article = ArticlePost.objects.get(id=article_id)
+            article.delete()
+        except:
+            return http.HttpResponse('数据库错误')
+        # 删除后回到文章列表页
         return redirect(reverse('article:article_list'))
