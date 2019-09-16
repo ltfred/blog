@@ -37,8 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    # 注册应用
     'article',
+    'userprofile',
 ]
 
 MIDDLEWARE = [
@@ -77,12 +78,13 @@ WSGI_APPLICATION = 'my_blog.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'blog',
-        'PASSWORD': 'mysql123',
-        'HOST': '127.0.0.1',
-        'PORT': 3306,
-        'USER': 'root'
+        'ENGINE': 'django.db.backends.mysql',  # 使用mysql
+        'NAME': 'blog',  # 数据库名
+        'USER': 'root',  # 用户
+        'PASSWORD': 'mysql123',  # 密码
+        'HOST': '127.0.0.1',  # ip
+        'PORT': 3306,  # 端口
+
     }
 }
 
@@ -124,7 +126,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
-
+# 静态文件路径
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
+
