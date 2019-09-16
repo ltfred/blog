@@ -1,8 +1,7 @@
 import markdown
 from django import http
-from django.shortcuts import render
-
-
+from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.views import View
 
 from article.models import ArticlePost
@@ -46,3 +45,32 @@ class ArticleDetailView(View):
         context = {'article': article}
 
         return render(request, 'article/detail.html', context)
+
+
+class NewArticle(View):
+    """写文章"""
+
+    def get(self, request):
+        """返回写文章页面"""
+        return render(request, 'article/create.html')
+
+    def post(self, request):
+        """新增文章"""
+
+        # 获取参数
+        title = request.POST.get('title')
+        body = request.POST.get('body')
+
+        # 检验参数
+        if not all([title, body]):
+            return http.HttpResponse('缺少必传参数')
+        # 获取当前用户
+        user = request.user
+
+        try:
+            ArticlePost.objects.create(title=title, body=body, author=user)
+
+        except:
+            return http.HttpResponse('数据库错误')
+
+        return redirect(reverse('article:article_list'))
