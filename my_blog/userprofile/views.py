@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
 from userprofile.models import User
+from utils.login_require import LoginRequiredMixin
 
 
 class LoginView(View):
@@ -34,7 +35,7 @@ class LoginView(View):
         return redirect(reverse('article:article_list'))
 
 
-class LogoutView(View):
+class LogoutView(LoginRequiredMixin, View):
     """退出登录"""
     def get(self, request):
         logout(request)
