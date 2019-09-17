@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.views import View
 
 from article.models import ArticlePost
+from utils.login_require import LoginRequiredMixin
 
 
 class ArticleListView(View):
@@ -47,7 +48,7 @@ class ArticleDetailView(View):
         return render(request, 'article/detail.html', context)
 
 
-class NewArticle(View):
+class NewArticle(LoginRequiredMixin, View):
     """写文章"""
 
     def get(self, request):
@@ -76,7 +77,7 @@ class NewArticle(View):
         return redirect(reverse('article:article_list'))
 
 
-class DeleteArticleView(View):
+class DeleteArticleView(LoginRequiredMixin, View):
     """删除文章"""
 
     def get(self, request, article_id):
@@ -84,14 +85,23 @@ class DeleteArticleView(View):
 
         try:
             article = ArticlePost.objects.get(id=article_id)
-            article.delete()
         except:
             return http.HttpResponse('数据库错误')
+
+        # 判断是否是自己写的文章
+        if not request.user == article.author:
+            return http.HttpResponse('只能删除自己的文章')
+
+        try:
+            article.delete()
+        except:
+            return http.HttpResponse('删除文章失败')
+
         # 删除后回到文章列表页
         return redirect(reverse('article:article_list'))
 
 
-class UpdateArticleView(View):
+class UpdateArticleView(LoginRequiredMixin, View):
     """修改文章"""
 
     def get(self, request, article_id):
@@ -100,6 +110,10 @@ class UpdateArticleView(View):
             article = ArticlePost.objects.get(id=article_id)
         except:
             return http.HttpResponse('数据库错误')
+
+        # 判断是否是自己写的文章
+        if not request.user == article.author:
+            return http.HttpResponse('只能修改自己的文章')
 
         context = {'article': article}
 
@@ -118,6 +132,10 @@ class UpdateArticleView(View):
 
         try:
             article = ArticlePost.objects.get(id=article_id)
+
+            # 判断是否是自己写的文章
+            if not request.user == article.author:
+                return http.HttpResponse('只能修改自己的文章')
             article.title = title
             article.body = body
             article.save()

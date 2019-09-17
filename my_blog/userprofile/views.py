@@ -3,7 +3,6 @@ from django.contrib.auth import login, logout
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
-
 from userprofile.models import User
 
 
@@ -39,4 +38,36 @@ class LogoutView(View):
     """退出登录"""
     def get(self, request):
         logout(request)
+        return redirect(reverse('article:article_list'))
+
+
+class UserRegisterView(View):
+    """用户注册"""
+
+    def get(self, request):
+        """返回注册界面"""
+        return render(request, 'userprofile/register.html')
+
+    def post(self, request):
+        """注册"""
+
+        # 获取参数
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        password2 = request.POST.get('password2')
+
+        if not all([username, email, password, password2]):
+            return http.HttpResponse('缺少必传参数')
+
+        if not password == password2:
+            return http.HttpResponse('两次密码输入不相同')
+
+        try:
+            user = User.objects.create_user(username=username, email=email, password=password)
+        except:
+            return http.HttpResponse('注册失败')
+        # 状态保持
+        login(request, user)
+        # 跳转到列表页
         return redirect(reverse('article:article_list'))
