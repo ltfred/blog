@@ -9,5 +9,7 @@ urlpatterns = [
     url(r'^logout/$', views.LogoutView.as_view(), name='logout'),
     # 注册
     url(r'^register/$', views.UserRegisterView.as_view(), name='register'),
+    # 重置密码
+    url(r'^reset/$', views.ResetPassword.as_view(), name='reset_password'),
 
 ]

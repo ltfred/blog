@@ -1,3 +1,5 @@
+import re
+
 from django import http
 from django.contrib.auth import login, logout
 from django.shortcuts import render, redirect
@@ -72,3 +74,21 @@ class UserRegisterView(View):
         login(request, user)
         # 跳转到列表页
         return redirect(reverse('article:article_list'))
+
+
+class ResetPassword(View):
+    """重置用户密码"""
+
+    def get(self, request):
+        """返回重置密码界面"""
+        return render(request, 'userprofile/reset_password.html')
+
+    def post(self, request):
+
+        email = request.POST.get('email')
+
+        if not email:
+            return http.HttpResponse('请输入邮箱')
+
+        if not re.match(r'^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$', email):
+            return http.HttpResponse('请输入正确的邮箱')
