@@ -1,5 +1,5 @@
+import random
 import re
-
 from django import http
 from django.contrib.auth import login, logout
 from django.shortcuts import render, redirect
@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.views import View
 from userprofile.models import User
 from utils.login_require import LoginRequiredMixin
+from utils.mail import send_reset_mail
 
 
 class LoginView(View):
@@ -92,3 +93,16 @@ class ResetPassword(View):
 
         if not re.match(r'^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$', email):
             return http.HttpResponse('请输入正确的邮箱')
+
+        password = '%06d' % random.randint(0, 999999)
+
+        try:
+            user = User.objects.get(email=email)
+            user.set_password(password)
+            user.save()
+        except:
+            return http.HttpResponse('你的邮箱没有注册')
+
+        send_reset_mail(email, password)
+
+        return redirect(reverse('userprofile:login'))
