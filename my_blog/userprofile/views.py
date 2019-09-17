@@ -5,9 +5,10 @@ from django.contrib.auth import login, logout
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
+from celery_tasks.email.tasks import send_reset_mail
 from userprofile.models import User
 from utils.login_require import LoginRequiredMixin
-from utils.mail import send_reset_mail
+# from utils.mail import send_reset_mail
 
 
 class LoginView(View):
@@ -40,6 +41,7 @@ class LoginView(View):
 
 class LogoutView(LoginRequiredMixin, View):
     """退出登录"""
+
     def get(self, request):
         logout(request)
         return redirect(reverse('article:article_list'))
@@ -103,13 +105,14 @@ class ResetPassword(View):
         except:
             return http.HttpResponse('你的邮箱没有注册')
 
-        send_reset_mail(email, password)
+        send_reset_mail.delay(email, password)
 
         return redirect(reverse('userprofile:login'))
 
 
 class UserProfileEditView(LoginRequiredMixin, View):
     """个人信息修改"""
+
     def get(self, request):
 
         user = request.user
@@ -117,3 +120,17 @@ class UserProfileEditView(LoginRequiredMixin, View):
         context = {'user': user}
 
         return render(request, 'userprofile/edit.html', context=context)
+
+    def post(self, request):
+
+        phone = request.POST.get('phone')
+        bio = request.POST.get('bio')
+        user = request.user
+
+        try:
+            user.phone = phone
+            user.bio = bio
+            user.save()
+        except:
+            return http.HttpResponse('修改失败')
+        return redirect(reverse('article:article_list'))
