@@ -106,3 +106,14 @@ class ResetPassword(View):
         send_reset_mail(email, password)
 
         return redirect(reverse('userprofile:login'))
+
+
+class UserProfileEditView(LoginRequiredMixin, View):
+    """个人信息修改"""
+    def get(self, request):
+
+        user = request.user
+
+        context = {'user': user}
+
+        return render(request, 'userprofile/edit.html', context=context)
